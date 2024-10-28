@@ -1,0 +1,116 @@
+import { TextField } from "@mui/material";
+
+export default function InputComponent({
+  type = "text",
+  inputclassname,
+  // errortext'te değer verilmişse input error durumuna geçer ve verilen text altta gösterilir. örnek kullanım: errortext="renk boş bırakılamaz!"
+  errortext = null,
+  labeltext,
+  placeholdertext,
+  value,
+  setvalue,
+  infotext,
+  max,
+  min,
+  step,
+  disabled = false,
+  inputstyles,
+}) {
+  return (
+    <div className="w-full my-2 ">
+      <TextField
+        sx={{
+          width: "100%",
+        }}
+        error={errortext ? true : false}
+        label={labeltext}
+        type={type}
+        value={value}
+        disabled={disabled}
+        max={max}
+        min={min}
+        step={step}
+        onChange={(e) => {
+          setvalue(e.currentTarget.value);
+        }}
+        placeholder={placeholdertext}
+      />
+      {errortext && (
+        <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center gap-1">
+          <span className="inline-block">
+            <svg
+              width="20px"
+              height="20px"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g id="SVGRepo_bgCaredrediered" stredoke-width="0"></g>
+              <g
+                id="SVGRepo_tredaceredCaredrediered"
+                stredoke-linecap="redound"
+                stredoke-linejoin="redound"
+              ></g>
+              <g id="SVGRepo_iconCaredrediered">
+                {" "}
+                <path
+                  d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z"
+                  fill="red"
+                ></path>{" "}
+                <path
+                  d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z"
+                  fill="red"
+                ></path>{" "}
+                <path
+                  fill-redule="evenodd"
+                  clip-redule="evenodd"
+                  d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z"
+                  fill="red"
+                ></path>{" "}
+              </g>
+            </svg>
+          </span>
+          {errortext}
+        </p>
+      )}
+      {infotext && (
+        <p className="mt-2 text-sm text-[#1C274C]  flex items-center gap-1">
+          <span className="inline-block">
+            <svg
+              width="20px"
+              height="20px"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                {" "}
+                <path
+                  d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z"
+                  fill="#1C274C"
+                ></path>{" "}
+                <path
+                  d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z"
+                  fill="#1C274C"
+                ></path>{" "}
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z"
+                  fill="#1C274C"
+                ></path>{" "}
+              </g>
+            </svg>
+          </span>
+          {infotext}
+        </p>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,541 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  COMPANY_MANAGER
+  STORE_MANAGER
+  EMPLOYEE
+  LOGISTIC
+  SUPPLIER
+}
+
+
+model User{
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber String @unique
+  password String 
+  role Role @default(EMPLOYEE)
+  email String @unique 
+  
+  Employee Employee?
+  
+
+  Supplier Supplier?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Employee{
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  userId  String @unique @db.ObjectId
+  name String 
+  surname String
+  
+  address String?
+  
+  store Store? @relation(fields:[storeId],references:[id])
+  storeId String? @db.ObjectId
+  
+  salary Int
+  bonus Int
+
+  maxDiscountRatePercent Float @default(0)
+
+  managerComment String?
+  managerComment_en String?
+  managerComment_tr String?
+  managerComment_uk String?
+  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier{
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  
+  user User @relation(fields:[userId],references:[id])
+  userId  String @unique @db.ObjectId
+  
+  competentName_1 String?
+  competentPhoneNumber_1 String?
+  competentEmail_1 String?
+
+  competentName_2 String?
+  competentPhoneNumber_2 String?
+  competentEmail_2 String?
+  
+  firmName String?
+  firmAddress String?
+  firmTaxNumber String?
+  firmPhoneNumber_1 String?
+  firmPhoneNumber_2 String?
+  firmEmail String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer{
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  
+  name  String 
+  surname String
+
+  phone String?
+  email String? @unique
+
+  address String?
+  
+}
+
+
+// Ölçü
+model Measurement{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+
+  name  String @unique
+
+  en String @default("0")
+  boy String @default("0")
+  genislik String @default("0")
+  unit     String  @default("cm")
+  
+  
+  specialValue String @default("")
+  specialValueDefined Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ProductMeasurement ProductMeasurement[]
+}
+
+
+// kumaş kategorisi
+model FabricCategory{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+
+
+  fabrics Fabric[]  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+// kumaş 
+model Fabric {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  
+  fabricCategory FabricCategory? @relation(fields: [fabricCategoryId], references: [id])
+  fabricCategoryId String? @db.ObjectId
+  
+
+  name String @unique
+  description String 
+  image       String?
+
+  name_tr   String @default("")
+  name_uk String @default("")
+  name_en   String @default("")
+
+  description_tr   String @default("")
+  description_uk String @default("")
+  description_en   String @default("")
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  ProductFabric ProductFabric[]
+}
+// metal
+model Metal {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name        String @default("")
+  description String @default("")
+  image       String?
+
+  name_tr   String @default("")
+  name_uk String @default("")
+  name_en   String @default("")
+
+  description_tr   String @default("")
+  description_uk String @default("")
+  description_en   String @default("")
+
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ProductMetal ProductMetal[]
+}
+// renk
+model Color {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  
+  name        String @unique
+
+  description String @default("")
+
+  colorCode String @unique 
+
+  name_tr   String @default("")
+  name_uk String @default("")
+  name_en   String @default("")
+
+  description_tr   String @default("")
+  description_uk String @default("")
+  description_en   String @default("")
+
+
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  ProductColor ProductColor[]
+}
+
+// aşağıdakiler ürünün component'ları. ürüne eklenen component'ların fiyat bilgisi gibi farklı ekstra özelliklerini tutmak için varlar.
+
+
+model ProductMeasurement{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  item Measurement @relation(fields: [measurementId], references: [id])
+  measurementId String @db.ObjectId
+
+  product Product @relation(fields: [productId], references: [id],onDelete: Cascade)
+  productId String @db.ObjectId
+
+  price Int @default(0)
+  isStandard Boolean @default(true)
+
+}
+
+model ProductFabric{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  item Fabric @relation(fields: [fabricId], references: [id])
+  fabricId String @db.ObjectId
+
+  product Product @relation(fields: [productId], references: [id],onDelete: Cascade)
+  productId String @db.ObjectId
+
+  price Int @default(0)
+  isStandard Boolean @default(true)
+  
+
+}
+
+model ProductMetal{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  item Metal @relation(fields: [metalId], references: [id])
+  metalId String @db.ObjectId
+
+  product Product @relation(fields: [productId], references: [id],onDelete: Cascade)
+  productId String @db.ObjectId
+
+  price Int @default(0)
+  isStandard Boolean @default(true)
+
+}
+
+model ProductColor{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  item Color @relation(fields: [colorId], references: [id])
+  colorId String @db.ObjectId
+
+  product Product @relation(fields: [productId], references: [id],onDelete: Cascade)
+  productId String @db.ObjectId
+
+  price Int @default(0)
+  isStandard Boolean @default(true)
+
+}
+
+model ProductExtra{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String @db.ObjectId
+
+  
+  description String
+
+  price Int @default(0)
+  isStandard Boolean @default(false)
+
+}
+
+model ProductImage{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String @db.ObjectId
+  
+  image String
+}
+
+model ProductType{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  description String @default("")
+
+
+  name_tr String @default("")
+  name_en String @default("")
+  name_uk String @default("")
+
+  description_tr String @default("")
+  description_en String @default("")
+  description_uk String @default("")
+
+  products Product[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+
+
+model Product{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  productCode String @unique
+  productType ProductType?  @relation(fields: [productTypeId], references: [id])
+  productTypeId String? @db.ObjectId
+  category String 
+  name String
+  description String @default("")
+
+  measurements ProductMeasurement[] 
+  
+  fabrics ProductFabric[]
+
+  metals ProductMetal[]
+
+  colors ProductColor[]
+    
+  extras ProductExtra[]
+
+  images ProductImage[]
+
+
+
+  price Json
+  // json data tipinde tutuyoruz çünkü currency bilgisi de alınacak.
+  // örnek veri:
+  //  price={
+  //   currency:"USD",
+  //   amount:1000
+  //  }
+
+  
+  name_tr   String @default("")
+  name_uk String @default("")
+  name_en   String @default("")
+
+  description_tr   String @default("")
+  description_uk String @default("")
+  description_en   String @default("")
+
+
+  collectionIDs String[] @db.ObjectId
+  collections Collection[] @relation(fields: [collectionIDs], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+}
+
+
+model CollectionType{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  description String @default("")
+
+
+  name_tr String @default("")
+  name_uk String @default("")
+  name_en   String @default("")
+
+  description_tr String @default("")
+  description_uk String @default("")
+  description_en String @default("")
+
+  Collection Collection[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+  
+
+model Collection{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  collectionCode String @unique
+  name String @unique
+  description String @default("")
+  image String @default("")
+
+  productIDs String[] @db.ObjectId
+  products Product[] @relation(fields: [productIDs], references: [id])
+
+  collectionType CollectionType?  @relation(fields: [collectionTypeId], references: [id])
+  collectionTypeId String? @db.ObjectId
+
+  name_tr String @default("")
+  name_uk String @default("")
+  name_en   String @default("")
+
+  description_tr   String @default("")
+  description_uk String @default("")
+  description_en   String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+
+
+
+
+model Company {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String @unique // şirket ismi
+
+  competentName String // yetkili ismi
+ 
+  tel_1 String
+  tel_2 String?
+  fax String?
+
+
+  email_1 String
+  email_2 String?
+
+  address          String
+
+  taxNumber      String
+
+  bankName        String
+  bankAccountNumber String
+  bankMFO     String
+  iban         String
+
+  kdvRatePercent Float?
+
+  extra_1          String?
+  extra_2          String?
+  extra_3          String?
+
+  address_en String?
+  address_tr String?
+  address_uk String?
+
+  extra_1_en String?
+  extra_1_tr String?
+  extra_1_uk String?
+
+  extra_2_en String?
+  extra_2_tr String?
+  extra_2_uk String?
+
+  extra_3_en String?
+  extra_3_tr String?
+  extra_3_uk String?
+
+  
+  isActive Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+}
+
+
+
+model Store {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  
+
+  country String
+  state   String
+
+  address          String
+
+  tel_1 String
+  tel_2 String?
+  
+  fax String?
+
+  email_1 String
+  email_2 String?
+
+  maxDiscountRate Float?
+  maxBonusRate    Float?
+
+  name_en String?
+  name_tr String?
+  name_uk String?
+
+  address_en String?
+  address_tr String?
+  address_uk String?
+
+  description          String
+  description_en   String?
+  description_uk String?
+  description_tr   String?
+
+  extra_1 String?
+  extra_2 String?
+  extra_3 String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+
+
+  employees Employee[]
+
+  expenses Expense[]
+}
+
+model Expense{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  store Store?  @relation(fields: [storeId], references: [id])
+  storeId String? @db.ObjectId
+
+  paidTo String?
+  paidTo_en String?
+  paidTo_uk String?
+  paidTo_tr String?
+
+  paymentDate DateTime @default(now())  
+  paymentType String
+  paymentName String
+  
+  amount Json
+  description String
+  description_tr String?
+  description_en String?
+  description_uk String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+  
+
